@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.stock.mapper.StockMapper">
+	
+	<select id="getAllStock" resultType="java.util.Map">
+		select * from tb_stock;
+	</select>
+	<select id="selectAllDate" resultType="java.lang.String">
+		select * from tb_stock_date;
+	</select>
+	
+	<select id="selectByStartAndEnd" resultType="com.stock.pojo.StockMap" parameterType="java.util.Map">
+		select * from tb_stock where date BETWEEN #{startDate} and #{endDate} 
+		and pchg > 9.9  
+		and turnover > 5
+		and vaturnover > 3 * 10000 * 10000
+		and vaturnover &lt; 20 * 10000 * 10000
+		and tclose &lt; 50
+		and tclose > 5
+		and high != low 
+		order by date desc;
+	</select>
+	<select id="selectSumByCodeAndDateSec" resultType="java.lang.Float" parameterType="java.util.Map">
+		select sum(PCHG) from tb_stock where code =#{code} and date BETWEEN #{startDate} and #{endDate};
+	</select>
+	<select id="selectByCodeAndDateSec" resultType="com.stock.pojo.StockMap" parameterType="java.util.Map">
+		select * from tb_stock 
+		where
+		CODE = #{code}
+		AND 
+		date 
+		BETWEEN #{startDate} and #{endDate}
+		order by date asc;
+	</select>
+	<select id="selectByCodeAndDate" resultType="com.stock.pojo.StockMap" parameterType="java.util.Map">
+		select * from tb_stock where code = #{code} and date = #{date};
+	</select>
+	
+	<select id="select5DAvg" resultType="java.lang.Float" parameterType="java.util.Map">
+		select avg(TCLOSE) from tb_stock where code =#{code} and date BETWEEN #{startDate} and #{endDate};
+	</select>
+	<insert id="addBatch" parameterType="java.util.List" useGeneratedKeys="true">
+    			insert into tb_stock
+    			(DATE,CODE,NAME,TCLOSE,HIGH,LOW,TOPEN,LCLOSE,CHG,PCHG,TURNOVER,VOTURNOVER,VATURNOVER,TCAP,MCAP)
+    			values
+    			<foreach collection="list" item="item" index="index" separator=",">
+    				(
+    					#{item.DATE},
+    					#{item.CODE},
+    					#{item.NAME},
+    					#{item.TCLOSE},
+    					#{item.HIGH},
+    					#{item.LOW},
+    					#{item.TOPEN},
+    					#{item.LCLOSE},
+    					#{item.CHG},
+    					#{item.PCHG},
+    					#{item.TURNOVER},
+    					#{item.VOTURNOVER},
+    					#{item.VATURNOVER},
+    					#{item.TCAP},
+    					#{item.MCAP}	
+    				)
+    		     </foreach>		
+    </insert>    
+</mapper>
